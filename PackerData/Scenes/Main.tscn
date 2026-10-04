@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ikhimqfpe8tc" path="res://PackerData/Scripts/main.gd" id="1_glv2v"]
 [ext_resource type="PackedScene" uid="uid://sf4cxl8op2tv" path="res://MetalEngineBase/Utils/ResourcePicker.tscn" id="3_r0du0"]
 
-[node name="Control" type="Control" unique_id=2138693863 node_paths=PackedStringArray("mod_Location", "exec_Path", "base_Pack", "unpacked_base")]
+[node name="Control" type="Control" unique_id=2138693863 node_paths=PackedStringArray("mod_Location", "exec_Path", "base_Pack", "unpacked_base", "mod_export")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,6 +15,7 @@ mod_Location = NodePath("PanelContainer/VBoxContainer/PanelContainer3/VBoxContai
 exec_Path = NodePath("PanelContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec")
 base_Pack = NodePath("PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack")
 unpacked_base = NodePath("PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase")
+mod_export = NodePath("PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=318287848]
 layout_mode = 1
@@ -43,7 +44,7 @@ autowrap_mode = 2
 
 [node name="GodotExec" parent="PanelContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=316868228 instance=ExtResource("3_r0du0")]
 layout_mode = 2
-resource_Tyoes = ["*.exe"]
+resource_Tyoes = PackedStringArray("*.exe")
 
 [node name="PanelContainer4" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=975783714]
 layout_mode = 2
@@ -60,7 +61,7 @@ autowrap_mode = 2
 
 [node name="basePack" parent="PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer" unique_id=735820284 instance=ExtResource("3_r0du0")]
 layout_mode = 2
-resource_Tyoes = ["*.pck"]
+resource_Tyoes = PackedStringArray("*.pck")
 
 [node name="PanelContainer5" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1643307431]
 layout_mode = 2
@@ -78,6 +79,11 @@ autowrap_mode = 2
 [node name="unpackedBase" parent="PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer" unique_id=1852714208 instance=ExtResource("3_r0du0")]
 layout_mode = 2
 resource_Type = 2
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer" unique_id=485174321]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Unpack Game"
 
 [node name="PanelContainer3" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1919876734]
 layout_mode = 2
@@ -102,10 +108,23 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "Generate Import Files"
 
-[node name="Button" type="Button" parent="PanelContainer/VBoxContainer" unique_id=485174321]
+[node name="PanelContainer6" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1461392523]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Unpack Game"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer6" unique_id=1273779732]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=647815214]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Mod PCK Export Location"
+autowrap_mode = 2
+
+[node name="ModExport" parent="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=1626777722 instance=ExtResource("3_r0du0")]
+layout_mode = 2
+resource_Type = 4
+resource_Tyoes = PackedStringArray("*.pck")
 
 [node name="GeneratePack" type="Button" parent="PanelContainer/VBoxContainer" unique_id=186220417]
 layout_mode = 2
@@ -115,7 +134,8 @@ text = "Generate Pack"
 [connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec" to="." method="_on_godot_exec_changed"]
 [connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack" to="." method="_on_base_pack_changed"]
 [connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase" to="." method="_on_unpacked_base_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
 [connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer3/VBoxContainer/ModLoc" to="." method="_on_mod_loc_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/GenerateImport" to="." method="_on_generate_import_pressed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport" to="." method="_on_mod_export_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/GeneratePack" to="." method="_on_generate_pack_pressed"]

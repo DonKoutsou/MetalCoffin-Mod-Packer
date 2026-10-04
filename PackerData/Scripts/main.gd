@@ -6,6 +6,7 @@ class_name Main
 @export var exec_Path : ResourcePicker
 @export var base_Pack : ResourcePicker
 @export var unpacked_base : ResourcePicker
+@export var mod_export : ResourcePicker
 
 var execPath
 
@@ -42,6 +43,7 @@ func _ready() -> void:
 	mod_Location.SetFile(dirs.ModDir)
 	base_Pack.SetFile(dirs.BaseDataDir)
 	unpacked_base.SetFile(dirs.UnpackedDataDir)
+	mod_export.SetFile(dirs.ModPackDir)
 
 #--------------------------------------------------------------
 func GeneratePack() -> void:
@@ -52,6 +54,10 @@ func GeneratePack() -> void:
 		printerr("Missing Unpacked Game Data")
 		return
 	
+	if (dirs.ModPackDir.is_empty()):
+		printerr("No export directory for mod set")
+		return
+	
 	if (dirs.BaseDataDir == "" or !FileAccess.file_exists(dirs.BaseDataDir)):
 		printerr("Wrong Base Pack")
 	
@@ -60,24 +66,28 @@ func GeneratePack() -> void:
 	ProjectSettings.load_resource_pack(dirs.BaseDataDir)
 	
 	print("--------- Generating Project Dif ---------")
-	PackerHelper._build_diff(dirs.ModDir, dirs.ModDir, dirs.UnpackedDataDir, execPath + "Dif", [])
-	#generate_Import_Files(execPath + "Dif")
+	PackerHelper._build_diff(dirs.ModDir, dirs.ModDir, dirs.UnpackedDataDir, execPath + "Dif")
+	
 	#return
 	if (!DirAccess.dir_exists_absolute(execPath + "Dif")):
 		printerr("No differances found in files, opearation Canceled")
 		return
-		
-	ensure_project_godot_exists(execPath + "Dif")
+	
 	print("--------- Project Dif Created ---------")
+	
+	ensure_project_godot_exists(execPath + "Dif")
+	
+	generate_Import_Files(execPath + "Dif")
 
-	var modFileName = "/{0}.pck".format([dirs.ModDir.get_file()])
+
+	#var modFileName = "/{0}.pck".format([dirs.ModDir.get_file()])
 	var output = []
 
 	var pack_args = [
 		"--headless", 
 		"--path", execPath + "Dif",
 		"--patches", dirs.BaseDataDir,
-		"--export-pack", "Windows", execPath + modFileName
+		"--export-pack", "Windows", dirs.ModPackDir
 	]
 	
 	print("Packing into PCK...")
@@ -86,11 +96,8 @@ func GeneratePack() -> void:
 	print("--------- Cleaning Up Dif ---------")
 	PackerHelper.DeleteDirectoryRecursive(execPath + "Dif")
 	
-	dirs.ModPackDir = execPath + modFileName
-	ResourceSaver.save(dirs, execPath + "SavedDir.tres")
-	
 	if exit_code == 0:
-		print("Mod pack successfully created at: " + execPath)
+		print("Mod pack successfully created at: " + dirs.ModPackDir)
 	else:
 		print("Packing failed. Error logs: " + str(output))
 
@@ -335,6 +342,12 @@ func _on_unpacked_base_changed(t: String) -> void:
 	ResourceSaver.save(dirs, execPath + "SavedDir.tres")
 	print("Unpacked data pack path changed to {0}".format([t]))
 	
+#--------------------------------------------------------------
+func _on_mod_export_changed(t: String) -> void:
+	dirs.ModPackDir = t
+	ResourceSaver.save(dirs, execPath + "SavedDir.tres")
+	print("Mod Export Directory Changed to {0}".format([t]))
+
 #--------------------------------------------------------------
 func _on_generate_import_pressed() -> void:
 	if (dirs.ModDir == ""):

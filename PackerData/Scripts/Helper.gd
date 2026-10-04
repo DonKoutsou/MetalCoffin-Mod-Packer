@@ -2,6 +2,8 @@ extends RefCounted
 
 class_name PackerHelper
 
+#----------------------------------------------------------------------
+##Returns the path the Remap file points to
 static func get_target_path_from_remap(remap_file_path: String) -> String:
 	var config = ConfigFile.new()
 	var err = config.load(remap_file_path)
@@ -15,6 +17,33 @@ static func get_target_path_from_remap(remap_file_path: String) -> String:
 	print("Failed to parse remap file: ", remap_file_path)
 	return ""
 
+#----------------------------------------------------------------------
+##Returns the path the import file points to
+static func get_target_path_from_import(import_file_path: String) -> String:
+	var config = ConfigFile.new()
+	var err = config.load(import_file_path)
+	
+	if err == OK:
+		# Check the [remap] section for the compiled binary path
+		if config.has_section_key("remap", "path"):
+			var compiled_path = config.get_value("remap", "path")
+			return compiled_path # Returns e.g. "res://.godot/imported/player.png-4b2a3f...ctex"
+			
+		if config.has_section_key("remap", "path.bptc"):
+			var compiled_path = config.get_value("remap", "path.bptc")
+			return compiled_path 
+			
+		# Fallback: Some files use 'dest_files' array for multiple variants
+		if config.has_section_key("remap", "dest_files"):
+			var dest_files = config.get_value("remap", "dest_files")
+			if dest_files is Array and dest_files.size() > 0:
+				return dest_files[0]
+				
+	print("Failed to read import layout: ", import_file_path)
+	return ""
+
+#----------------------------------------------------------------------
+##Checks the UID cache an tried to reconstruct the UID files of all the resources in the directory
 static func reconstruct_all_uid_files(local_unpacked_root_dir: String) -> void:
 	# 1. Point to the unpacked .godot cache folder
 	var virtual_cache_path = "res://.godot/uid_cache.bin"
@@ -69,29 +98,7 @@ static func reconstruct_all_uid_files(local_unpacked_root_dir: String) -> void:
 	file.close()
 	print("Successfully reconstituted all project UID files!")
 
-static func get_target_path_from_import(import_file_path: String) -> String:
-	var config = ConfigFile.new()
-	var err = config.load(import_file_path)
-	
-	if err == OK:
-		# Check the [remap] section for the compiled binary path
-		if config.has_section_key("remap", "path"):
-			var compiled_path = config.get_value("remap", "path")
-			return compiled_path # Returns e.g. "res://.godot/imported/player.png-4b2a3f...ctex"
-			
-		if config.has_section_key("remap", "path.bptc"):
-			var compiled_path = config.get_value("remap", "path.bptc")
-			return compiled_path 
-			
-		# Fallback: Some files use 'dest_files' array for multiple variants
-		if config.has_section_key("remap", "dest_files"):
-			var dest_files = config.get_value("remap", "dest_files")
-			if dest_files is Array and dest_files.size() > 0:
-				return dest_files[0]
-				
-	print("Failed to read import layout: ", import_file_path)
-	return ""
-
+#----------------------------------------------------------------------
 static func run_opengds_decompiler(gdc_physical_path: String) -> void:
 
 	# 1. OS.get_executable_path().get_base_dir() finds the folder where your game is running on disk
@@ -130,6 +137,7 @@ static func run_opengds_decompiler(gdc_physical_path: String) -> void:
 	else:
 		print("OpenGDS failed with exit code: ", exit_code)
 
+#----------------------------------------------------------------------
 static func DeleteDirectoryRecursive(path: String) -> void:
 	var dir := DirAccess.open(path)
 
@@ -158,7 +166,10 @@ static func DeleteDirectoryRecursive(path: String) -> void:
 
 	DirAccess.remove_absolute(path)
 
-static func _build_diff(current_mod_dir: String,mod_root: String,base_root: String,staging_root: String,changed_files: Array[String]) -> void:
+#----------------------------------------------------------------------
+##Builds a new directory only containing the differances between the 2 directories provided
+##uses the SHA-256 to compare the files, check `_files_are_identical` function
+static func _build_diff(current_mod_dir: String,mod_root: String,base_root: String,staging_root: String) -> void:
 	var dir := DirAccess.open(current_mod_dir)
 
 	if dir == null:
@@ -195,7 +206,6 @@ static func _build_diff(current_mod_dir: String,mod_root: String,base_root: Stri
 					mod_root,
 					base_root,
 					staging_root,
-					changed_files
 				)
 		else:
 			# project.godot belongs to the temporary project and
@@ -220,21 +230,22 @@ static func _build_diff(current_mod_dir: String,mod_root: String,base_root: Stri
 				_copy_file(
 					mod_path,
 					staging_path,
-					changed_files
 				)
 
 				if (mod_path.ends_with(".tres")):
 					#var loadedRes : Resource = load("res://" + relative_path)
 					var deps = ResourceLoader.get_dependencies("res://" + relative_path)
 					if (deps.size() > 0):
-						SaveDep(deps, mod_root, staging_root, changed_files)
-					else:
-						print("thing")
+						print("--------- Dependencies Found - Packing ---------")
+						SaveDep(deps, mod_root, staging_root)
+						print("--------- Dependencies Packed ---------")
 				
 
 	dir.list_dir_end()
 
-static func SaveDep(dependencies : PackedStringArray, mod_dir : String, staging_root : String, changed_files: Array[String]) -> void:
+#----------------------------------------------------------------------
+##Used in the build dif function to carry over to the new dif directory the dependancies of each file
+static func SaveDep(dependencies : PackedStringArray, mod_dir : String, staging_root : String) -> void:
 	for dependency in dependencies:
 		var dependencyLoc : String
 		
@@ -251,13 +262,14 @@ static func SaveDep(dependencies : PackedStringArray, mod_dir : String, staging_
 			_copy_file(
 				dependencyLoc,
 				dependency_staging_path,
-				changed_files
+				true
 			)
 		
 		if (dependencyLoc.ends_with(".tres")):
-			SaveDep(ResourceLoader.get_dependencies(dependencyLoc), mod_dir, staging_root, changed_files)
+			SaveDep(ResourceLoader.get_dependencies(dependencyLoc), mod_dir, staging_root)
 			
-
+#----------------------------------------------------------------------
+##Passes both files through a hash function and checks the resault
 static func _files_are_identical(file_a: String,file_b: String) -> bool:
 
 	var hash_a := FileAccess.get_sha256(file_a)
@@ -265,8 +277,9 @@ static func _files_are_identical(file_a: String,file_b: String) -> bool:
 
 	return hash_a == hash_b
 
-
-static func _copy_file(source: String, destination: String, changed_files : Array[String]) -> void:
+#----------------------------------------------------------------------
+##Copies source file to destinaction without loading it
+static func _copy_file(source: String, destination: String, is_Deependency : bool = false) -> void:
 	var parent := destination.get_base_dir()
 
 	DirAccess.make_dir_recursive_absolute(parent)
@@ -287,8 +300,10 @@ static func _copy_file(source: String, destination: String, changed_files : Arra
 		print("File copying had errors")
 	file.close()
 	
-	print("  + " + source + " to " + destination)
-	changed_files.append(source)
+	if (is_Deependency):
+		print("       + DEPENDENCY --- " + source)
+	else:
+		print("  + " + source)
 	
 	if (source.ends_with(".tres")):
 		var uidPath = source + ".uid"
@@ -297,38 +312,10 @@ static func _copy_file(source: String, destination: String, changed_files : Arra
 			_copy_file(
 				uidPath,
 				destinationUID,
-				changed_files
+				is_Deependency
 			)
 
-
-func _remove_directory_recursive(path: String) -> void:
-	var dir := DirAccess.open(path)
-
-	if dir == null:
-		return
-
-	dir.list_dir_begin()
-
-	while true:
-		var file_name := dir.get_next()
-
-		if file_name == "":
-			break
-
-		if file_name == "." or file_name == "..":
-			continue
-
-		var full_path := path.path_join(file_name)
-
-		if dir.current_is_dir():
-			_remove_directory_recursive(full_path)
-		else:
-			DirAccess.remove_absolute(full_path)
-
-	dir.list_dir_end()
-
-	DirAccess.remove_absolute(path)
-
+#----------------------------------------------------------------------
 func is_python_installed() -> bool:
 	var output: Array[String] = []
 	
