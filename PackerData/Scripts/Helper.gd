@@ -234,7 +234,7 @@ static func _build_diff(current_mod_dir: String,mod_root: String,base_root: Stri
 
 				if (mod_path.ends_with(".tres")):
 					#var loadedRes : Resource = load("res://" + relative_path)
-					var deps = ResourceLoader.get_dependencies("res://" + relative_path)
+					var deps = ResourceLoader.get_dependencies(mod_path)
 					if (deps.size() > 0):
 						print("--------- Dependencies Found - Packing ---------")
 						SaveDep(deps, mod_root, staging_root)
