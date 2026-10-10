@@ -29,6 +29,12 @@ A dif will be made to see what changed from the original files on your mod and f
 
 Place that new .pck in `C:\Users\Admin\Documents\My Games\MetalCoffin\Mods` and start the game. If this directory does not exist for you make sure to run the game at least once for it to apear.
 
+## Other Tools
+The unpacked files can be manually modified or the Official tools can be used instead.
+* [Card Builder](https://github.com/DonKoutsou/Metal_Coffin_Card_Builder)
+* [Dialogue Editor](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
+* [Captain Creator](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
+
 ## Credits
 This project relies on the following open-source software:
 * OpenGDS — Used to handle the decompilation of game scripts, allowing modders to inspect and hook into the game's codebase. https://github.com/ABDO10DZ/OpenGDS
