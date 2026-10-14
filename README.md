@@ -34,7 +34,7 @@ The unpacked files can be manually modified or the Official tools can be used in
 * [Card Builder](https://github.com/DonKoutsou/Metal_Coffin_Card_Builder)
 * [Item Builder](https://github.com/DonKoutsou/Metal_Coffin_Item_Builder)
 * [Dialogue Editor](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
-* [Captain Creator](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
+* [Captain Creator](https://github.com/DonKoutsou/Metal_Coffin_Captain_Creator)
 
 ## Credits
 This project relies on the following open-source software:
