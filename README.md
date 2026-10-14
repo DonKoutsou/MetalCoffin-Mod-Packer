@@ -32,6 +32,7 @@ Place that new .pck in `C:\Users\Admin\Documents\My Games\MetalCoffin\Mods` and 
 ## Other Tools
 The unpacked files can be manually modified or the Official tools can be used instead.
 * [Card Builder](https://github.com/DonKoutsou/Metal_Coffin_Card_Builder)
+* [Item Builder](https://github.com/DonKoutsou/Metal_Coffin_Item_Builder)
 * [Dialogue Editor](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
 * [Captain Creator](https://github.com/DonKoutsou/Metal_Coffin_Dialogue_Editor)
 
