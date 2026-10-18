@@ -7,14 +7,29 @@ class_name Main
 @export var base_Pack : ResourcePicker
 @export var unpacked_base : ResourcePicker
 @export var mod_export : ResourcePicker
+@export var preview_pid_Path : ResourcePicker
+@export var preview_Pic_Preview : TextureRect
+
+@export var mod_title : LineEdit
+@export var mod_description : TextEdit
+@export var mod_ID : LineEdit
 
 var execPath
+var uploadingMod : bool = false
 
 static var ignores : Ignores
 static var dirs : SaveDirs
 
+var steamInitialised : bool = false
 #--------------------------------------------------------------
 func _ready() -> void:
+	var IsRunning = Steam.isSteamRunning()
+	
+	if (!IsRunning):
+		printerr("Steam Is Not Running, wont be able to upload mod to workshop")
+	else:
+		InitSteam()
+	
 	execPath = OS.get_executable_path()
 	execPath = execPath.replace(execPath.get_file(), "")
 
@@ -44,6 +59,20 @@ func _ready() -> void:
 	base_Pack.SetFile(dirs.BaseDataDir)
 	unpacked_base.SetFile(dirs.UnpackedDataDir)
 	mod_export.SetFile(dirs.ModPackDir)
+
+func InitSteam() -> bool:
+	print("Initialising Steam")
+	if (Steam.steamInit()):
+		Steam.run_callbacks()
+		Steam.item_created.connect(_on_item_created)
+		Steam.item_updated.connect(_on_item_updated)
+		steamInitialised = true
+		print("Steam initialised")
+		return true
+
+	printerr("Steam could not be initialised")
+	return false
+	
 
 #--------------------------------------------------------------
 func GeneratePack() -> void:
@@ -98,6 +127,7 @@ func GeneratePack() -> void:
 	
 	if exit_code == 0:
 		print("Mod pack successfully created at: " + dirs.ModPackDir)
+		mod_export.SetFile(dirs.ModPackDir)
 	else:
 		print("Packing failed. Error logs: " + str(output))
 
@@ -349,6 +379,14 @@ func _on_mod_export_changed(t: String) -> void:
 	print("Mod Export Directory Changed to {0}".format([t]))
 
 #--------------------------------------------------------------
+func _on_preview_pic_changed(t: String) -> void:
+	if (t.is_empty()):
+		preview_Pic_Preview.texture = null
+	else:
+		var img = Image.load_from_file(t)
+		preview_Pic_Preview.texture = ImageTexture.create_from_image(img)
+	
+#--------------------------------------------------------------
 func _on_generate_import_pressed() -> void:
 	if (dirs.ModDir == ""):
 		printerr("Missing Mod Dir")
@@ -370,3 +408,95 @@ func _on_button_pressed() -> void:
 		printerr("Wrong Base Pack")
 	
 	unpack_pck_to_disk()
+
+##STEAM##
+const APP_ID: int = 3551150 # Replace with your Steam App ID
+
+func _on_upload_mod_request_pressed() -> void:
+	var IsRunning = Steam.isSteamRunning()
+	
+	if (!IsRunning):
+		printerr("Steam Is Not Running, can't upload mod to workshop")
+	
+	if (!steamInitialised):
+		if (!InitSteam()):
+			return
+	
+	if (uploadingMod):
+		printerr("Uploading mod, please wait...")
+	
+	if (mod_ID.text.is_empty()):
+		#create new mod
+		create_Mod()
+	else:
+		#update existing mod
+		update_mod()
+	
+# Call this to upload a NEW mod.
+func create_Mod() -> void:
+	print("No Workshop ID was provided. Creating new workshop entry!")
+	Steam.createItem(APP_ID, Steam.WORKSHOP_FILE_TYPE_COMMUNITY)
+	uploadingMod = true
+
+##Called to update the content of the mod, needs a valid workshop id to do so
+func update_mod() -> void:
+	var id = str_to_var(mod_ID.text)
+	if (typeof(id) != TYPE_INT):
+		printerr("Invalid workshop ID")
+		uploadingMod = false
+		return
+		
+	var handle = Steam.startItemUpdate(APP_ID, id)
+
+	if (!mod_title.text.is_empty()):
+		print("Mod name will be updated to {0}".format([mod_title.text]))
+		print("Setting Mod Name resault : {0}".format([Steam.setItemTitle(handle, mod_title.text)]))
+		
+	if (!mod_description.text.is_empty()):
+		print("Mod description will be updated to {0}".format([mod_description.text]))
+		print("Setting Mod Description resault : {0}".format([Steam.setItemDescription(handle, mod_description.text)]))
+		
+	var previewImg = preview_pid_Path.selected
+	if (!previewImg.is_empty()):
+		print("Preview image will be updated to {0}".format([previewImg]))
+		print("Setting Preview Image resault : {0}".format([Steam.setItemPreview(handle, previewImg)]))
+	
+	
+	var content_path := dirs.ModPackDir.replace("/" + dirs.ModPackDir.get_file(), "")
+	if (!content_path.is_empty()):
+		print("Mod content being updated")
+		print("Setting Mod Content : {0}".format([Steam.setItemContent(handle, content_path)]))
+	
+	Steam.submitItemUpdate(handle, "Updated mod")
+	
+	print("Uploading mod to Steam Workshop: ", id)
+	uploadingMod = true
+
+# Called by Steam after creating the Workshop item.
+func _on_item_created(result: int, file_id: int, needs_to_accept_tos: bool) -> void:
+	if (result != Steam.RESULT_OK):
+		printerr("Failed to create Workshop item: %s" % result)
+		uploadingMod = false
+		return
+	
+	print("Workshop entry created with ID = {0}".format([file_id]))
+	
+	if (needs_to_accept_tos):
+		Steam.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/filedetails/?id=")
+	
+	mod_ID.text = var_to_str(file_id)
+	
+	update_mod()
+
+# Called when the upload/update finishes.
+func _on_item_updated(result: int,needs_to_accept_tos: bool, file_Id : int) -> void:
+	if result == Steam.RESULT_OK:
+		print("Workshop upload successful!")
+		if needs_to_accept_tos:
+			Steam.activateGameOverlayToWebPage(
+				"https://steamcommunity.com/sharedfiles/filedetails/?id="
+			)
+	else:
+		printerr("Workshop upload failed: %s" % result)
+	
+	uploadingMod = false

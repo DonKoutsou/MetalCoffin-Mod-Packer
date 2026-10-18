@@ -20,12 +20,20 @@ config/windows_native_icon="res://PackerData/Assets/LogoIc.ico"
 
 [display]
 
-window/size/viewport_width=300
+window/size/viewport_width=500
 window/size/viewport_height=600
 window/size/extend_to_title=true
 window/size/sharp_corners=true
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godotsteam/plugin.cfg")
+
+[gui]
+
+theme/custom="uid://de7fb8k462lxb"
 
 [physics]
 
@@ -34,3 +42,10 @@ window/stretch/aspect="expand"
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+
+[steam]
+
+initialization/app_data/app_id=3551150
+settings/enable_debug=true
+initialization/processes/initialize_on_startup=true
+initialization/processes/embed_callbacks=true

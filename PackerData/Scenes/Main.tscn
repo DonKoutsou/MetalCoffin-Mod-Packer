@@ -1,9 +1,10 @@
 [gd_scene format=3 uid="uid://byqe6jh8wbxy0"]
 
 [ext_resource type="Script" uid="uid://ikhimqfpe8tc" path="res://PackerData/Scripts/main.gd" id="1_glv2v"]
+[ext_resource type="StyleBox" uid="uid://ci3yyoa54a17w" path="res://MetalEngineBase/Inventory/YellowPanel.tres" id="2_ntbnk"]
 [ext_resource type="PackedScene" uid="uid://sf4cxl8op2tv" path="res://MetalEngineBase/Utils/ResourcePicker.tscn" id="3_r0du0"]
 
-[node name="Control" type="Control" unique_id=2138693863 node_paths=PackedStringArray("mod_Location", "exec_Path", "base_Pack", "unpacked_base", "mod_export")]
+[node name="Control" type="Control" unique_id=2138693863 node_paths=PackedStringArray("mod_Location", "exec_Path", "base_Pack", "unpacked_base", "mod_export", "preview_pid_Path", "preview_Pic_Preview", "mod_title", "mod_description", "mod_ID")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,11 +12,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_glv2v")
-mod_Location = NodePath("PanelContainer/VBoxContainer/PanelContainer3/VBoxContainer/ModLoc")
-exec_Path = NodePath("PanelContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec")
-base_Pack = NodePath("PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack")
-unpacked_base = NodePath("PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase")
-mod_export = NodePath("PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport")
+mod_Location = NodePath("PanelContainer/ScrollContainer/VBoxContainer/PanelContainer3/VBoxContainer/ModLoc")
+exec_Path = NodePath("PanelContainer/ScrollContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec")
+base_Pack = NodePath("PanelContainer/ScrollContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack")
+unpacked_base = NodePath("PanelContainer/ScrollContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase")
+mod_export = NodePath("PanelContainer/ScrollContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport")
+preview_pid_Path = NodePath("PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer/VBoxContainer/PreviewPic")
+preview_Pic_Preview = NodePath("PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer/TextureRect")
+mod_title = NodePath("PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/LineEdit")
+mod_description = NodePath("PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/TextEdit")
+mod_ID = NodePath("PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/LineEdit2")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=318287848]
 layout_mode = 1
@@ -25,117 +31,198 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=812695689]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer" unique_id=1640881630]
+layout_mode = 2
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer" unique_id=812695689]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1881646299]
-layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer" unique_id=987663821]
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1881646299]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_ntbnk")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer" unique_id=987663821]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=345370568]
+[node name="Label" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=345370568]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Godot Executable"
 autowrap_mode = 2
 
-[node name="GodotExec" parent="PanelContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=316868228 instance=ExtResource("3_r0du0")]
+[node name="GodotExec" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=316868228 instance=ExtResource("3_r0du0")]
 layout_mode = 2
+size_flags_vertical = 1
 resource_Tyoes = PackedStringArray("*.exe")
+allowExternalLinks = true
 
-[node name="PanelContainer4" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=975783714]
+[node name="PanelContainer4" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=975783714]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_ntbnk")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer4" unique_id=1442507519]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer4" unique_id=1442507519]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer" unique_id=827018578]
+[node name="Label3" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer4/VBoxContainer" unique_id=827018578]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Base Pack"
 autowrap_mode = 2
 
-[node name="basePack" parent="PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer" unique_id=735820284 instance=ExtResource("3_r0du0")]
+[node name="basePack" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer4/VBoxContainer" unique_id=735820284 instance=ExtResource("3_r0du0")]
 layout_mode = 2
+size_flags_vertical = 1
 resource_Tyoes = PackedStringArray("*.pck")
+allowExternalLinks = true
 
-[node name="PanelContainer5" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1643307431]
+[node name="PanelContainer5" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1643307431]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_ntbnk")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer5" unique_id=1210839676]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer5" unique_id=1210839676]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer" unique_id=1507389811]
+[node name="Label3" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer5/VBoxContainer" unique_id=1507389811]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Unpacked Base Files"
 autowrap_mode = 2
 
-[node name="unpackedBase" parent="PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer" unique_id=1852714208 instance=ExtResource("3_r0du0")]
+[node name="unpackedBase" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer5/VBoxContainer" unique_id=1852714208 instance=ExtResource("3_r0du0")]
 layout_mode = 2
+size_flags_vertical = 1
 resource_Type = 2
+allowExternalLinks = true
 
-[node name="Button" type="Button" parent="PanelContainer/VBoxContainer" unique_id=485174321]
+[node name="Button" type="Button" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=485174321]
 layout_mode = 2
-size_flags_vertical = 3
 text = "Unpack Game"
 
-[node name="PanelContainer3" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1919876734]
+[node name="PanelContainer3" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1919876734]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_ntbnk")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer3" unique_id=13703157]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer3" unique_id=13703157]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer3/VBoxContainer" unique_id=725434006]
+[node name="Label3" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer3/VBoxContainer" unique_id=725434006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Mod Location"
 autowrap_mode = 2
 
-[node name="ModLoc" parent="PanelContainer/VBoxContainer/PanelContainer3/VBoxContainer" unique_id=923681851 instance=ExtResource("3_r0du0")]
+[node name="ModLoc" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer3/VBoxContainer" unique_id=923681851 instance=ExtResource("3_r0du0")]
 layout_mode = 2
+size_flags_vertical = 1
 resource_Type = 2
+allowExternalLinks = true
 
-[node name="GenerateImport" type="Button" parent="PanelContainer/VBoxContainer" unique_id=1388774099]
+[node name="GenerateImport" type="Button" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1388774099]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 text = "Generate Import Files"
 
-[node name="PanelContainer6" type="PanelContainer" parent="PanelContainer/VBoxContainer" unique_id=1461392523]
+[node name="PanelContainer6" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1461392523]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_ntbnk")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/PanelContainer6" unique_id=1273779732]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer6" unique_id=1273779732]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=647815214]
+[node name="Label3" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=647815214]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Mod PCK Export Location"
 autowrap_mode = 2
 
-[node name="ModExport" parent="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=1626777722 instance=ExtResource("3_r0du0")]
+[node name="ModExport" parent="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer6/VBoxContainer" unique_id=1626777722 instance=ExtResource("3_r0du0")]
 layout_mode = 2
+size_flags_vertical = 1
 resource_Type = 4
 resource_Tyoes = PackedStringArray("*.pck")
+allowExternalLinks = true
 
-[node name="GeneratePack" type="Button" parent="PanelContainer/VBoxContainer" unique_id=186220417]
+[node name="GeneratePack" type="Button" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=186220417]
 layout_mode = 2
-size_flags_vertical = 3
 text = "Generate Pack"
 
-[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec" to="." method="_on_godot_exec_changed"]
-[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack" to="." method="_on_base_pack_changed"]
-[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase" to="." method="_on_unpacked_base_changed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer3/VBoxContainer/ModLoc" to="." method="_on_mod_loc_changed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/GenerateImport" to="." method="_on_generate_import_pressed"]
-[connection signal="Changed" from="PanelContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport" to="." method="_on_mod_export_changed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/GeneratePack" to="." method="_on_generate_pack_pressed"]
+[node name="FoldableContainer" type="FoldableContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=720795240]
+layout_mode = 2
+folded = true
+title = "Steam Workshop"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer" unique_id=585728792]
+visible = false
+layout_mode = 2
+
+[node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer" unique_id=1679283106]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_ntbnk")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2" unique_id=1305443620]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=911145191]
+layout_mode = 2
+text = "Mod Details"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=460851260]
+layout_mode = 2
+placeholder_text = "insert mod name"
+
+[node name="TextEdit" type="TextEdit" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=1086320173]
+custom_minimum_size = Vector2(0, 40.49)
+layout_mode = 2
+placeholder_text = "insert mod description"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=1306747570]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer" unique_id=1140943624]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer" unique_id=388766146]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=572224989]
+layout_mode = 2
+text = "Preview Pic"
+
+[node name="PreviewPic" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=398013406 instance=ExtResource("3_r0du0")]
+layout_mode = 2
+resource_Type = 4
+resource_Tyoes = PackedStringArray("*.png")
+allowExternalLinks = true
+
+[node name="Label3" type="Label" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=233528489]
+layout_mode = 2
+text = "Workshop ID (only for existing mods)"
+
+[node name="LineEdit2" type="LineEdit" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer" unique_id=1725261453]
+layout_mode = 2
+placeholder_text = "insert ID"
+
+[node name="UploadModRequest" type="Button" parent="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer" unique_id=1284725384]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Upload Mod"
+
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer/VBoxContainer/GodotExec" to="." method="_on_godot_exec_changed"]
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer4/VBoxContainer/basePack" to="." method="_on_base_pack_changed"]
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer5/VBoxContainer/unpackedBase" to="." method="_on_unpacked_base_changed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer3/VBoxContainer/ModLoc" to="." method="_on_mod_loc_changed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/VBoxContainer/GenerateImport" to="." method="_on_generate_import_pressed"]
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/PanelContainer6/VBoxContainer/ModExport" to="." method="_on_mod_export_changed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/VBoxContainer/GeneratePack" to="." method="_on_generate_pack_pressed"]
+[connection signal="Changed" from="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/PanelContainer2/VBoxContainer/HBoxContainer/VBoxContainer/PreviewPic" to="." method="_on_preview_pic_changed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/VBoxContainer/FoldableContainer/VBoxContainer/UploadModRequest" to="." method="_on_upload_mod_request_pressed"]
