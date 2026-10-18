@@ -424,6 +424,7 @@ func _on_upload_mod_request_pressed() -> void:
 	
 	if (uploadingMod):
 		printerr("Uploading mod, please wait...")
+		return
 	
 	if (mod_ID.text.is_empty()):
 		#create new mod

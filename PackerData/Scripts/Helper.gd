@@ -218,6 +218,7 @@ static func _build_diff(current_mod_dir: String,mod_root: String,base_root: Stri
 			
 			var is_new := not FileAccess.file_exists(base_path)
 			var is_changed := false
+			var is_script := mod_path.ends_with(".gd")
 
 			if not is_new:
 				is_changed = not _files_are_identical(
@@ -225,7 +226,7 @@ static func _build_diff(current_mod_dir: String,mod_root: String,base_root: Stri
 					base_path
 				)
 
-			if is_new or is_changed:
+			if is_new or is_changed or is_script:
 			
 				_copy_file(
 					mod_path,
