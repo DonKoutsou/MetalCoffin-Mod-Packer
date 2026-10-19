@@ -87,6 +87,7 @@ static func reconstruct_uid(local_unpacked_root_dir: String) -> void:
 		
 		#Instead of making a .uid file for .tres files, we add the UID in the .tres file
 		
+		
 		## 5. Append the .uid extension suffix (e.g., music_manager.gd.uid)
 		#var target_uid_file_path = local_file_path + ".uid"
 		#
@@ -100,9 +101,35 @@ static func reconstruct_uid(local_unpacked_root_dir: String) -> void:
 		#if file_write:
 			#file_write.store_string(uid_text_string)
 			#file_write.close()
-			
+	
 	file.close()
 	print("Successfully reconstituted all project UID files!")
+
+static func restore_dependency_uids(text: String) -> String:
+	var path_regex := RegEx.new()
+	path_regex.compile('path="([^"]+)"')
+
+	var output := PackedStringArray()
+
+	for line in text.split("\n"):
+		if line.begins_with("[ext_resource ") \
+		and not line.contains('uid="'):
+			var match_result := path_regex.search(line)
+
+			if match_result:
+				var path := match_result.get_string(1)
+				var uid := ResourceLoader.get_resource_uid(path)
+
+				if uid != ResourceUID.INVALID_ID:
+					var uid_text := ResourceUID.id_to_text(uid)
+					line = line.replace(
+						'path="',
+						'uid="%s" path="' % uid_text
+					)
+
+		output.append(line)
+
+	return "\n".join(output)
 
 #----------------------------------------------------------------------
 static func write_uid_to_tres(path: String, uid: String) -> bool:
@@ -140,7 +167,9 @@ static func write_uid_to_tres(path: String, uid: String) -> bool:
 	if file == null:
 		return false
 
-	file.store_string(content)
+	var fixed_text := restore_dependency_uids(content)
+	file.store_string(fixed_text)
+	
 	file.close()
 	return true
 
