@@ -44,7 +44,7 @@ static func get_target_path_from_import(import_file_path: String) -> String:
 
 #----------------------------------------------------------------------
 ##Checks the UID cache an tried to reconstruct the UID files of all the resources in the directory
-static func reconstruct_all_uid_files(local_unpacked_root_dir: String) -> void:
+static func reconstruct_uid(local_unpacked_root_dir: String) -> void:
 	# 1. Point to the unpacked .godot cache folder
 	var virtual_cache_path = "res://.godot/uid_cache.bin"
 	
@@ -76,27 +76,73 @@ static func reconstruct_all_uid_files(local_unpacked_root_dir: String) -> void:
 		# 3. Convert the 64-bit int back into Godot's standard string text syntax
 		var uid_text_string = ResourceUID.id_to_text(uid_int64)
 		
+		
 		# 4. Locate the path destination inside your local extraction directory
 		var relative_path = virtual_path.trim_prefix("res://")
 		var local_file_path = local_unpacked_root_dir.path_join(relative_path)
 		if (FileAccess.file_exists(local_file_path + ".import")):
 			continue
-		# 5. Append the .uid extension suffix (e.g., music_manager.gd.uid)
-		var target_uid_file_path = local_file_path + ".uid"
 		
-		# Guard: Ensure the nested directory structures exist on the hard drive
-		var parent_dir = target_uid_file_path.get_base_dir()
-		if not DirAccess.dir_exists_absolute(parent_dir):
-			DirAccess.make_dir_recursive_absolute(parent_dir)
-			
-		# 6. Save the text line to disk
-		var file_write = FileAccess.open(target_uid_file_path, FileAccess.WRITE)
-		if file_write:
-			file_write.store_string(uid_text_string)
-			file_write.close()
+		write_uid_to_tres(local_file_path, uid_text_string)
+		
+		#Instead of making a .uid file for .tres files, we add the UID in the .tres file
+		
+		## 5. Append the .uid extension suffix (e.g., music_manager.gd.uid)
+		#var target_uid_file_path = local_file_path + ".uid"
+		#
+		## Guard: Ensure the nested directory structures exist on the hard drive
+		#var parent_dir = target_uid_file_path.get_base_dir()
+		#if not DirAccess.dir_exists_absolute(parent_dir):
+			#DirAccess.make_dir_recursive_absolute(parent_dir)
+			#
+		## 6. Save the text line to disk
+		#var file_write = FileAccess.open(target_uid_file_path, FileAccess.WRITE)
+		#if file_write:
+			#file_write.store_string(uid_text_string)
+			#file_write.close()
 			
 	file.close()
 	print("Successfully reconstituted all project UID files!")
+
+#----------------------------------------------------------------------
+static func write_uid_to_tres(path: String, uid: String) -> bool:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return false
+
+	var content := file.get_as_text()
+	file.close()
+
+	var regex := RegEx.new()
+	regex.compile('(?m)^\\[gd_resource([^\\]]*)\\]')
+
+	var match_result := regex.search(content)
+	if match_result == null:
+		return false
+
+	var header := match_result.get_string(0)
+	var attributes := match_result.get_string(1)
+
+	# Remove any existing UID attribute.
+	var uid_regex := RegEx.new()
+	uid_regex.compile('\\s+uid="[^"]*"')
+	attributes = uid_regex.sub(attributes, "", true)
+
+	# Add the new UID.
+	attributes += ' uid="' + uid + '"'
+
+	content = content.replace(
+		header,
+		"[gd_resource" + attributes + "]"
+	)
+
+	file = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return false
+
+	file.store_string(content)
+	file.close()
+	return true
 
 #----------------------------------------------------------------------
 static func run_opengds_decompiler(gdc_physical_path: String) -> void:

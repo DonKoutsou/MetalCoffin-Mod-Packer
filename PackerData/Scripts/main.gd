@@ -179,7 +179,7 @@ func unpack_pck_to_disk() -> void:
 	# 2. Start the recursive extraction process from the root virtual directory
 	_extract_directory_recursive("res://", output_dir)
 	
-	PackerHelper.reconstruct_all_uid_files(output_dir)
+	PackerHelper.reconstruct_uid(output_dir)
 
 	print("Extraction complete!")
 
